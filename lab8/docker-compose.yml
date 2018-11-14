@@ -1,0 +1,29 @@
+version: "3"
+services:
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100MB"
+        max-file: "3"
+  mongo:
+    image: mongo
+    ports:
+    - "27017:27017"
+  api:
+    build: ./MyExpressApp
+    ports:
+    - "3001:3001"
+    depends_on:
+    - mongo
+    - redis
+    command: node routes/index.js
+  web:
+    build: ./videogames
+    ports:
+    - "8000:80"
+    links:
+    - api
