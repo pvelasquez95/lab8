@@ -4,10 +4,16 @@ var mongo = require('mongodb').MongoClient;
 var objectId = require('mongodb').ObjectID;
 var app = express();
 var assert = require('assert');
-var url = 'mongodb://mongo:27017';
-//var redis = require("redis");
-//var redis_client = redis.createClient();
+var url = 'mongodb://localhost:27017/videogames';
+var redis = require("redis");
+var redis_client = redis.createClient();
 var db;
+
+var cache = require('express-redis-cache')({
+  port:6379,
+  
+})
+
 app.listen(3001)
 console.log('Log listening on port 3001...')
 app.use(express.json())
@@ -73,8 +79,8 @@ app.post('/api/juegos/', function (req, res, next) {
   });
 });
 
-app.put('/api/juegos/:id', function (req, res, next) {
-  var id = req.params.id;
+app.put('/api/juegos/', function (req, res, next) {
+  var id = req.body.id;
   const item = {
     name: req.body.name
     , platform: req.body.platform
