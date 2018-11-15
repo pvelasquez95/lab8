@@ -11,6 +11,8 @@ var db;
 
 var cache = require('express-redis-cache')({
   port:6379,
+  host: 'localhost',
+  auth_pass:null,
   
 })
 
