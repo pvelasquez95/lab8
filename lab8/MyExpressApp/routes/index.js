@@ -13,8 +13,13 @@ var cache = require('express-redis-cache')({
   port:6379,
   host: 'localhost',
   auth_pass:null,
-  
-})
+  db:0,
+  prefix:'home',
+  enabled:true
+});
+
+const redis_url = process.env.redis_url;
+const client = redis.createClient(redis_url);
 
 app.listen(3001)
 console.log('Log listening on port 3001...')
@@ -28,7 +33,10 @@ app.use(function (req, res, next) {
 
 app.use(cors());
 
-
+app.engine('handlebars', exphbs({ defaultlayout: 'main'}));
+app.set('cache',cache);
+app.use(bodyparser.json());
+app.use('/', juegos)
 
 app.get('/api/juegos/', function (req, res, next) {
   mongo.connect(url, function (err, client) {
