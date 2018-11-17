@@ -4,22 +4,22 @@ var mongo = require('mongodb').MongoClient;
 var objectId = require('mongodb').ObjectID;
 var app = express();
 var assert = require('assert');
-var url = 'mongodb://localhost:27017/videogames';
-var redis = require("redis");
-var redis_client = redis.createClient();
+var url = 'mongodb://localhost:27017/juegos';
+//var redis = require("redis");
+//var redis_client = redis.createClient();
 var db;
 
-var cache = require('express-redis-cache')({
+/*var cache = require('express-redis-cache')({
   port:6379,
   host: 'localhost',
   auth_pass:null,
   db:0,
   prefix:'home',
   enabled:true
-});
+});*/
 
-const redis_url = process.env.redis_url;
-const client = redis.createClient(redis_url);
+//const redis_url = process.env.redis_url;
+//const client = redis.createClient(redis_url);
 
 app.listen(3001)
 console.log('Log listening on port 3001...')
@@ -33,10 +33,10 @@ app.use(function (req, res, next) {
 
 app.use(cors());
 
-app.engine('handlebars', exphbs({ defaultlayout: 'main'}));
-app.set('cache',cache);
-app.use(bodyparser.json());
-app.use('/', juegos)
+//app.engine('handlebars', exphbs({ defaultlayout: 'main'}));
+//app.set('cache',cache);
+//app.use(bodyparser.json());
+//app.use('/', juegos)
 
 app.get('/api/juegos/', function (req, res, next) {
   mongo.connect(url, function (err, client) {
@@ -81,7 +81,7 @@ app.post('/api/juegos/', function (req, res, next) {
     db.collection('juegos').insertOne(juego, function (err, result) {
       assert.equal(null, err);
       if (err) return console.log(err);
-      redis_insert(result.insertedId, result.ops[0]);
+      //redis_insert(result.insertedId, result.ops[0]);
       console.log("Item inserted");
       res.status(201).send(result);
       client.close();
@@ -130,14 +130,12 @@ app.delete('/api/juegos/:id', function (req, res, next) {
   });
 });
 
-function redis_insert(id,object)
-{
+function redis_insert(id, object) {
   console.log("Record from redis inserted");
   redis_client.set(id, JSON.stringify(object), redis.print);
 }
 
-function redis_delete(id)
-{
-  console.log("Record from redis deleted"); 
+function redis_delete(id) {
+  console.log("Record from redis deleted");
   redis_client.del(id);
 }
